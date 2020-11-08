@@ -16,6 +16,13 @@ var svg = d3
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// Define the div for the tooltip
+var tooltip = d3
+    .select("#root")
+    .append("div")
+    .attr("id", "tooltip")
+    .style("opacity", 0);
+
 d3.json(source).then((data) => {
     var yearsDate = data.data.map(function (item) {
         return new Date(item[0]);
@@ -71,5 +78,20 @@ d3.json(source).then((data) => {
         .attr("height", function (d) {
             return height - y(d[1]);
         })
-        .attr("fill", "#69b3a2");
+        .attr("fill", "#69b3a2")
+        .on("mouseover", function (d) {
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip.attr("data-date", d.srcElement.getAttribute("data-date"));
+            tooltip
+                .html(
+                    d.srcElement.getAttribute("data-date") +
+                        "<br/>" +
+                        d.srcElement.getAttribute("data-gdp")
+                )
+                .style("left", d.pageX + "px")
+                .style("top", d.pageY - 28 + "px");
+        })
+        .on("mouseout", function (d) {
+            tooltip.transition().duration(500).style("opacity", 0);
+        });
 });
